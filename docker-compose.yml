@@ -1,0 +1,26 @@
+version: "3.9"
+
+networks: #objeto para especificar qual rede quero criar
+  algafood-network: #nome da rede
+    driver: bridge #tipo de rede
+
+services: # definindo os sserviços (containers que quero levantar)
+  algafood-mysql: #nome do container
+    image: mysql:8.0 #imagem do container, mysql versão 8.0
+    environment: #variáeis que eu queira passar
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes" #variável para deixar o root sem senha
+    ports: #definindo as portas
+      - "3306:3306" #mapeamento da porta
+    networks: #definindo a rede do container
+      - algafood-network #é a rede definida acima
+
+  algafood-api: #nome do container
+    image: algafood-api #imagem do container da aplicação (gerada pelo maven)
+    environment:
+      DB_HOST: algafood-mysql #usando o nome do container do mysql (o docker engine vai resolver o IP - usa o servidor de DNS nativo do proprio docker)
+    ports:
+      - "8080:8080"
+    networks: #definindo a rede do container
+      - algafood-network #é a rede definida acima (mesma rede do BD)
+    depends_on: #diz que esse container precisa ser inicializado DEPOIS do container MYSQL. Não resolve 100% o problema pq ele não espera o mysql terminar sua inicialização, apenas diz que só será executado após a execução do mysql (se o mysql demorar de startar, corre o risco desse ainda startar antes da finalização por completo do start do mysql )
+      - algafood-mysql
