@@ -16,6 +16,8 @@ services: # definindo os sserviços (containers que quero levantar)
 
   algafood-api: #nome do container
     image: algafood-api #imagem do container da aplicação (gerada pelo maven)
+    #Executa o wait-for-it, aguarda até 30 segundos, fica observando o host algafood-mysql na porta 3306; na hora que o host  na porta passada ficar disponível (ready), executa o comando após "--" ("java", "-jar", "api.jar")
+    command: ["/wait-for-it.sh", "-t", "30", "algafood-mysql:3306", "--", "java", "-jar", "api.jar"] #substituindo o CMD do dockerfile. Inserindo o wait-for-it para aguardar a conclusão do MYSQL e, após, executar o .Jar
     environment:
       DB_HOST: algafood-mysql #usando o nome do container do mysql (o docker engine vai resolver o IP - usa o servidor de DNS nativo do proprio docker)
     ports:
